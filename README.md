@@ -1,4 +1,6 @@
-# Transient stability prediction - IEEE 39-bus system (SVM)
+# SVM-based-TSA
+
+**Transient stability assessment of the IEEE 39-bus system with a Support Vector Machine (SVM).**
 
 Predicts whether the IEEE 39-bus system stays **stable** after a contingency from 4 voltage and 4 frequency samples
 at each of the 10 generator buses (B30-B39), i.e. 80 inputs. Label `Overall_Stability` comes from the TSI
