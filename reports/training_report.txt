@@ -1,0 +1,121 @@
+Dataset: IEEE39_voltage_frequency_4sample_SVM_dataset.csv
+rows                               3715
+columns                              85
+missing values                        0
+infinite values                       0
+duplicate rows                        0
+rows with voltage > 1.1 p.u.         10
+rows with |f - 50| > 5 Hz            10
+rows with an impossible reading      10
+
+== Split (by contingency) ==
+            rows  contingencies  stable  unstable  unstable_pct  share_of_rows_pct
+set                                                                               
+Train       2655            531    2172       483          18.2               71.5
+Validation   530            106     434        96          18.1               14.3
+Test         530            106     433        97          18.3               14.3
+Rows with impossible readings (train / validation / test): [10, 0, 0]
+
+== Choosing settings: grouped 5-fold cross-validation inside the training set ==
+     scaler      C  cv_bal_acc  cv_std gamma_label
+robust_clip   10.0      0.9743  0.0159       0.001
+robust_clip   10.0      0.9737  0.0182        0.01
+robust_clip    1.0      0.9730  0.0156        0.01
+   standard  100.0      0.9715  0.0128       0.001
+   standard   10.0      0.9714  0.0151       0.003
+robust_clip   10.0      0.9703  0.0144       0.003
+robust_clip  100.0      0.9675  0.0169       0.001
+robust_clip    1.0      0.9673  0.0196       scale
+robust_clip 1000.0      0.9670  0.0305        0.03
+robust_clip   10.0      0.9660  0.0184       scale
+Chosen: {'scaler': 'robust_clip', 'C': 10.0, 'gamma': 0.001}
+
+For comparison, choosing on the validation set alone would pick {'scaler': 'robust_clip', 'C': 1000.0, 'gamma': 0.03} (validation 0.9925), but that setting scores only 0.9670 in cross-validation - its validation win is mostly luck.
+
+== Results ==
+Cross-validation on train (chosen setting): balanced accuracy 0.9743 +/- 0.0159
+Train and Validation rows: model fitted on the training set.
+Test row: final model refitted on train + validation, scored once on the untouched test set.
+            accuracy  balanced_accuracy  unstable_recall  unstable_precision  unstable_f1  stable_recall  roc_auc  average_precision
+Train         0.9766             0.9817           0.9896              0.8935       0.9391         0.9738   0.9982             0.9918
+Validation    0.9698             0.9613           0.9479              0.8922       0.9192         0.9747   0.9943             0.9788
+Test          0.9528             0.9551           0.9588              0.8158       0.8815         0.9515   0.9919             0.9644
+
+Validation confusion matrix:
+                 predicted Unstable  predicted Stable
+actual Unstable                  91                 5
+actual Stable                    11               423
+
+Test confusion matrix:
+                 predicted Unstable  predicted Stable
+actual Unstable                  93                 4
+actual Stable                    21               412
+
+Test results by contingency type:
+                        cases  accuracy  unstable  unstable_found  unstable_missed  false_alarms
+Contingency_Type                                                                                
+Generator_Trip              5    0.0000         0               0                0             5
+Ground_Fault_Line_Trip    435    0.9724        64              60                4             8
+Line_Trip                  80    0.9000        33              33                0             8
+Load_Disconnection         10    1.0000         0               0                0             0
+
+Test results by load change (%):
+                 cases  accuracy  unstable  unstable_found  unstable_missed  false_alarms
+Load_Change_pct                                                                          
+-4.0               106    0.9434        14              13                1             5
+-2.0               106    0.9528        17              16                1             4
+ 0.0               106    0.9717        21              20                1             2
+ 2.0               106    0.9434        22              21                1             5
+ 4.0               106    0.9528        23              23                0             5
+
+Misclassified validation cases (16):
+ Case_ID Operating_Condition       Contingency_Type                         Contingency_ID   actual predicted  instability_score
+LT_00160                 -4%              Line_Trip            LineTrip_3_4_Ckt1_Fault0p5s   Stable  Unstable              0.412
+LT_00168                 -4%              Line_Trip           LineTrip_4_14_Ckt1_Fault0p3s   Stable  Unstable              0.237
+LT_00270                 -2%              Line_Trip           LineTrip_4_14_Ckt1_Fault0p3s   Stable  Unstable              0.695
+GF_00815                 -4% Ground_Fault_Line_Trip    LLG_Line5_6_Ckt1_Loc80pct_Fault0p5s   Stable  Unstable              0.081
+GF_01026                 -4% Ground_Fault_Line_Trip 3PHG_Line16_17_Ckt1_Loc20pct_Fault0p3s   Stable  Unstable              0.836
+GF_01039                 -4% Ground_Fault_Line_Trip 3PHG_Line16_19_Ckt1_Loc80pct_Fault0p1s Unstable    Stable             -0.870
+GF_01638                 -2% Ground_Fault_Line_Trip 3PHG_Line16_17_Ckt1_Loc20pct_Fault0p3s   Stable  Unstable              1.044
+GF_01651                 -2% Ground_Fault_Line_Trip 3PHG_Line16_19_Ckt1_Loc80pct_Fault0p1s Unstable    Stable             -0.881
+GF_02106                  0% Ground_Fault_Line_Trip   3PHG_Line7_8_Ckt1_Loc20pct_Fault0p3s   Stable  Unstable              0.322
+GF_02250                  0% Ground_Fault_Line_Trip 3PHG_Line16_17_Ckt1_Loc20pct_Fault0p3s   Stable  Unstable              1.329
+GF_02263                  0% Ground_Fault_Line_Trip 3PHG_Line16_19_Ckt1_Loc80pct_Fault0p1s Unstable    Stable             -0.904
+GF_02761                 +2% Ground_Fault_Line_Trip  3PHG_Line9_39_Ckt1_Loc80pct_Fault0p5s   Stable  Unstable              0.367
+GF_02875                 +2% Ground_Fault_Line_Trip 3PHG_Line16_19_Ckt1_Loc80pct_Fault0p1s Unstable    Stable             -0.925
+GF_02941                 +2% Ground_Fault_Line_Trip 3PHG_Line17_18_Ckt1_Loc80pct_Fault0p5s   Stable  Unstable              0.437
+GF_03281                 +4% Ground_Fault_Line_Trip    LLG_Line5_8_Ckt1_Loc80pct_Fault0p5s   Stable  Unstable              0.088
+GF_03487                 +4% Ground_Fault_Line_Trip 3PHG_Line16_19_Ckt1_Loc80pct_Fault0p1s Unstable    Stable             -0.941
+
+Misclassified test cases (25):
+ Case_ID Operating_Condition       Contingency_Type                         Contingency_ID   actual predicted  instability_score
+GT_00009                 -4%         Generator_Trip                          GenTrip_Bus38   Stable  Unstable              0.331
+GT_00019                 -2%         Generator_Trip                          GenTrip_Bus38   Stable  Unstable              0.543
+GT_00029                  0%         Generator_Trip                          GenTrip_Bus38   Stable  Unstable              0.813
+GT_00039                 +2%         Generator_Trip                          GenTrip_Bus38   Stable  Unstable              1.128
+GT_00049                 +4%         Generator_Trip                          GenTrip_Bus38   Stable  Unstable              1.506
+LT_00220                 -4%              Line_Trip          LineTrip_17_18_Ckt1_Fault0p5s   Stable  Unstable              0.426
+LT_00228                 -4%              Line_Trip          LineTrip_22_23_Ckt1_Fault0p3s   Stable  Unstable              1.339
+LT_00231                 -4%              Line_Trip          LineTrip_23_24_Ckt1_Fault0p3s   Stable  Unstable              2.194
+LT_00330                 -2%              Line_Trip          LineTrip_22_23_Ckt1_Fault0p3s   Stable  Unstable              1.532
+LT_00432                  0%              Line_Trip          LineTrip_22_23_Ckt1_Fault0p3s   Stable  Unstable              1.758
+LT_00522                 +2%              Line_Trip          LineTrip_16_24_Ckt1_Fault0p3s   Stable  Unstable              0.197
+LT_00534                 +2%              Line_Trip          LineTrip_22_23_Ckt1_Fault0p3s   Stable  Unstable              2.015
+LT_00636                 +4%              Line_Trip          LineTrip_22_23_Ckt1_Fault0p3s   Stable  Unstable              2.312
+GF_00940                 -4% Ground_Fault_Line_Trip  LLG_Line10_11_Ckt1_Loc20pct_Fault0p5s   Stable  Unstable              0.115
+GF_01266                 -4% Ground_Fault_Line_Trip 3PHG_Line28_29_Ckt1_Loc20pct_Fault0p5s Unstable    Stable             -0.141
+GF_01426                 -2% Ground_Fault_Line_Trip    LLG_Line5_6_Ckt1_Loc20pct_Fault0p5s   Stable  Unstable              0.294
+GF_01552                 -2% Ground_Fault_Line_Trip  LLG_Line10_11_Ckt1_Loc20pct_Fault0p5s   Stable  Unstable              0.991
+GF_01878                 -2% Ground_Fault_Line_Trip 3PHG_Line28_29_Ckt1_Loc20pct_Fault0p5s Unstable    Stable             -0.051
+GF_02358                  0% Ground_Fault_Line_Trip 3PHG_Line21_22_Ckt1_Loc20pct_Fault0p3s Unstable    Stable             -0.136
+GF_02614                 +2% Ground_Fault_Line_Trip    LLG_Line4_5_Ckt1_Loc20pct_Fault0p5s Unstable    Stable             -0.152
+GF_02863                 +2% Ground_Fault_Line_Trip 3PHG_Line16_17_Ckt1_Loc80pct_Fault0p3s   Stable  Unstable              0.152
+GF_02866                 +2% Ground_Fault_Line_Trip  LLG_Line16_17_Ckt1_Loc20pct_Fault0p5s   Stable  Unstable              0.088
+GF_03334                 +4% Ground_Fault_Line_Trip    LLG_Line7_8_Ckt1_Loc20pct_Fault0p5s   Stable  Unstable              0.139
+GF_03475                 +4% Ground_Fault_Line_Trip 3PHG_Line16_17_Ckt1_Loc80pct_Fault0p3s   Stable  Unstable              0.512
+GF_03478                 +4% Ground_Fault_Line_Trip  LLG_Line16_17_Ckt1_Loc20pct_Fault0p5s   Stable  Unstable              0.607
+
+Model saved   -> E:\Data Anltics\models\stability_svm.joblib
+Example input -> E:\Data Anltics\examples\example_case_unstable.csv  (actual: unstable, LT_00166)
+Example input -> E:\Data Anltics\examples\example_case_stable.csv  (actual: stable, LD_00054)
+Figures saved -> E:\Data Anltics\figures

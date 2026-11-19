@@ -1,0 +1,22 @@
+# Separate project with its own repository
+random_forest/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# LaTeX build files
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Editor settings
+.vscode/
+
+# Prediction outputs written next to input files by predict.py
+examples/*_predictions.csv
